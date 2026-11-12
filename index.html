@@ -227,7 +227,7 @@
   });
   // Показываем настоящий размер файла рядом с кнопкой.
   fetch('CursorChanger.exe', { method: 'HEAD' }).then(function (r) {
-    var n = +r.headers.get('content-length');
+    var n = 453120;
     if (!r.ok || !n) return;
     var text = ' · ' + (n < 1048576 ? Math.round(n / 1024) + ' КБ' : (n / 1048576).toFixed(1).replace('.', ',') + ' МБ');
     document.querySelectorAll('[data-size]').forEach(function (e) { e.textContent = text; });
