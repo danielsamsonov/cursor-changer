@@ -118,6 +118,7 @@
       <a href="#look">Как выглядит</a>
       <a href="#install">Установка</a>
       <a href="#faq">Вопросы</a>
+      <a href="packs.html" style="color:var(--accent-hi)">Курсор-паки</a>
     </nav>
   </header>
 
@@ -129,7 +130,7 @@
         <img src="img/windows.png" alt="">
         <span><strong>Скачать для Windows</strong><small>Бесплатно · один файл<span data-size></span></small></span>
       </a>
-      <p class="note">Windows 10 и 11. Ничего устанавливать не нужно — скачал и запустил.</p>
+      <p class="note">Windows 10 и 11. Ничего устанавливать не нужно — скачал и запустил.<br>Новое: <a href="packs.html" style="color:var(--accent-hi)">курсор-паки</a> — целый набор курсоров одним файлом, например с мемным хомяком.</p>
     </div>
     <div class="mascot"><div class="tile"></div><img src="img/icon.png" alt="Весёлый курсор — значок программы"></div>
   </div>
@@ -180,6 +181,7 @@
       <button class="tab" data-shot="img/shot-image.png">Картинка</button>
       <button class="tab" data-shot="img/shot-ai.png">ИИ</button>
       <button class="tab" data-shot="img/shot-scale.png">Масштаб</button>
+      <button class="tab" data-shot="img/shot-packs.png">Паки</button>
     </div>
     <div class="shot"><img id="shot" src="img/shot-shapes.png" alt="Окно программы «Смена курсора»" width="946" height="669"></div>
   </section>
@@ -227,7 +229,7 @@
   });
   // Показываем настоящий размер файла рядом с кнопкой.
   fetch('CursorChanger.exe', { method: 'HEAD' }).then(function (r) {
-    var n = 453120;
+    var n = 471552;
     if (!r.ok || !n) return;
     var text = ' · ' + (n < 1048576 ? Math.round(n / 1024) + ' КБ' : (n / 1048576).toFixed(1).replace('.', ',') + ' МБ');
     document.querySelectorAll('[data-size]').forEach(function (e) { e.textContent = text; });

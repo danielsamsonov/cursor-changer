@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Курсор-паки — Смена курсора</title>
+<meta name="description" content="Готовые наборы курсоров для программы «Смена курсора»: скачай файл .curpack, открой в программе и поменяй сразу все курсоры Windows.">
+<link rel="icon" type="image/png" href="img/icon.png">
+<style>
+  :root {
+    --bg: #161722; --card: #222434; --card2: #30334a; --line: #3a3e5a;
+    --accent: #7c5cff; --accent-hi: #9a82ff; --sky: #38bdf8;
+    --text: #eef0fa; --dim: #9ca1bc; --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    cursor: url("img/cursor.png") 6 3, auto;
+    overflow-x: hidden;
+  }
+  a, button, label.btn { cursor: url("img/cursor.png") 6 3, pointer; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  header { display: flex; align-items: center; gap: 12px; padding: 18px 0; }
+  header img { width: 40px; height: 40px; background: linear-gradient(135deg, #fff, #c8e6ff); border-radius: 11px; padding: 2px; }
+  header b { font-size: 18px; }
+  header a.home { display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; }
+  header nav { margin-left: auto; display: flex; gap: 22px; }
+  header nav a { color: var(--dim); text-decoration: none; font-size: 15px; }
+  header nav a:hover { color: var(--text); }
+
+  .hero { padding: 34px 0 20px; position: relative; }
+  .hero::before {
+    content: ""; position: absolute; inset: -120px -200px auto auto; width: 560px; height: 560px; z-index: -1;
+    background: radial-gradient(closest-side, rgba(124, 92, 255, .28), rgba(56, 189, 248, .10) 60%, transparent);
+  }
+  h1 { font-size: clamp(34px, 5.4vw, 54px); line-height: 1.08; margin: 0 0 16px; letter-spacing: -1px; }
+  h1 span { background: linear-gradient(90deg, var(--accent-hi), var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--dim); font-size: 19px; margin: 0; max-width: 36em; }
+  code { background: var(--card2); border-radius: 6px; padding: 1px 7px; font: 15px Consolas, monospace; color: var(--text); }
+
+  h2 { font-size: 30px; margin: 0 0 8px; letter-spacing: -.5px; }
+  .sub { color: var(--dim); margin: 0 0 24px; }
+  section { padding: 36px 0; }
+
+  .packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .pack { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; transition: border-color .15s; }
+  .pack:hover { border-color: var(--accent); }
+  .pack h3 { margin: 0; font-size: 20px; overflow-wrap: anywhere; }
+  .pack .by { color: var(--dim); font-size: 14.5px; margin: 2px 0 14px; overflow-wrap: anywhere; }
+  .cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 14px; }
+  .cell { aspect-ratio: 1; background: #e2e5f0; border-radius: 9px; display: grid; place-items: center; }
+  .cell.dark { background: #0d0e16; }
+  .cell img { width: 78%; height: 78%; }
+  .pack .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .pack .hint { color: var(--dim); font-size: 13.5px; margin: 10px 0 0; }
+
+  .btn {
+    display: inline-block; border: 0; border-radius: 11px; padding: 9px 18px; font: inherit; font-size: 15px; font-weight: 600;
+    background: var(--accent); color: #fff; text-decoration: none;
+  }
+  .btn:hover { background: var(--accent-hi); }
+  .btn.ghost { background: var(--card2); }
+  .btn.ghost:hover { background: var(--line); }
+  .msg { color: var(--dim); }
+  .msg.bad { color: var(--bad); }
+
+  .drop { border: 2px dashed var(--line); border-radius: 18px; padding: 26px 20px; text-align: center; color: var(--dim); margin-bottom: 16px; }
+  .drop.over { border-color: var(--accent); background: rgba(124, 92, 255, .08); }
+  .drop p { margin: 0 0 12px; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .how { background: var(--card); border-radius: 18px; padding: 22px 24px; }
+  .how h3 { margin: 0 0 10px; font-size: 20px; }
+  .how ol { margin: 0; padding-left: 22px; color: var(--dim); }
+  .how li { margin: 6px 0; }
+  .how b { color: var(--text); }
+  .shot { background: var(--card); border-radius: 18px; padding: 12px; margin-top: 16px; }
+  .shot img { display: block; width: 100%; height: auto; border-radius: 10px; }
+  footer { color: var(--dim); font-size: 14px; text-align: center; padding: 10px 0 40px; }
+
+  @media (max-width: 820px) {
+    .two { grid-template-columns: 1fr; }
+    header nav a.opt { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="home" href="index.html"><img src="img/icon.png" alt=""><b>Смена курсора</b></a>
+    <nav>
+      <a href="#packs">Паки</a>
+      <a class="opt" href="#check">Проверить свой</a>
+      <a class="opt" href="#how">Как сделать</a>
+      <a href="index.html">Скачать программу</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Курсор-паки: <span>все курсоры разом</span></h1>
+    <p class="lead">Пак — это один файл <code>.curpack</code>, в котором лежит целый набор курсоров: указатель, рука, ожидание, стрелки масштаба и другие. Скачал, открыл в программе, нажал одну кнопку.</p>
+  </div>
+
+  <section id="packs">
+    <h2>Готовые паки</h2>
+    <p class="sub">Наведи мышку на карточку — курсор станет таким, как в паке.</p>
+    <div class="packs" id="list"></div>
+    <p class="msg" id="listMsg">Загружаю паки…</p>
+  </section>
+
+  <section id="check">
+    <h2>Проверить свой пак</h2>
+    <p class="sub">Посмотри, как пак выглядит, прежде чем делиться им. Файл никуда не отправляется — он открывается только у тебя в браузере.</p>
+    <div class="drop" id="drop">
+      <p>Перетащи сюда файл <code>.curpack</code> или выбери его.</p>
+      <label class="btn ghost">Выбрать файл<input type="file" id="file" accept=".curpack,application/json"></label>
+    </div>
+    <div class="packs" id="mine"></div>
+    <p class="msg bad" id="mineMsg"></p>
+  </section>
+
+  <section id="how">
+    <h2>Как пользоваться</h2>
+    <p class="sub">Сохранение и публикация — это один и тот же файл <code>.curpack</code>.</p>
+    <div class="two">
+      <div class="how">
+        <h3>Поставить готовый пак</h3>
+        <ol>
+          <li>Нажми <b>«Скачать .curpack»</b> на карточке пака.</li>
+          <li>Открой программу <a href="index.html" style="color:var(--accent-hi)">«Смена курсора»</a> и перейди на вкладку <b>«Паки»</b>.</li>
+          <li>Нажми <b>«Открыть .curpack…»</b> или просто перетащи файл в окно.</li>
+          <li>Нажми <b>«Применить пак»</b>. Вернуть всё назад можно кнопкой «Вернуть как было».</li>
+        </ol>
+      </div>
+      <div class="how">
+        <h3>Сделать и опубликовать свой</h3>
+        <ol>
+          <li>Сделай курсор на вкладке «Формы», «Рисовать», «Картинка» или «ИИ».</li>
+          <li>На вкладке <b>«Паки»</b> выбери ячейку и нажми <b>«Вставить мой курсор»</b>. Повтори для остальных ячеек.</li>
+          <li>Впиши название и автора, нажми <b>«Сохранить .curpack…»</b>.</li>
+          <li>Этот файл и есть публикация: отправь его друзьям или положи в папку <code>packs</code> этого сайта — и пак сам появится на этой странице.</li>
+        </ol>
+        <p style="margin:14px 0 0"><a class="btn ghost" id="upload" hidden target="_blank" rel="noopener">Открыть папку паков на GitHub</a></p>
+      </div>
+    </div>
+    <div class="shot"><img src="img/shot-packs.png" alt="Вкладка «Паки» в программе «Смена курсора»" width="946" height="669" loading="lazy"></div>
+  </section>
+
+  <footer>Смена курсора · курсор-паки для Windows 10 и 11</footer>
+</div>
+
+<script>
+  var ROLES = {
+    Arrow: 'Указатель', Hand: 'Ссылка', IBeam: 'Текст', Wait: 'Ожидание', AppStarting: 'В фоне', No: 'Запрещено',
+    Help: 'Справка', Crosshair: 'Прицел', SizeAll: 'Перемещение', SizeWE: 'Масштаб влево-вправо', SizeNS: 'Масштаб вверх-вниз',
+    SizeNWSE: 'Масштаб наискосок \\', SizeNESW: 'Масштаб наискосок /', UpArrow: 'Стрелка вверх', NWPen: 'Перо'
+  };
+  var ORDER = Object.keys(ROLES);
+
+  // Читает текст файла .curpack. Всё, что внутри, считаем чужими данными и проверяем.
+  function parsePack(text) {
+    var d;
+    try { d = JSON.parse(text); } catch (e) { d = null; }
+    if (!d || d.format !== 'curpack' || !Array.isArray(d.cursors)) throw new Error('Это не файл курсор-пака.');
+    var seen = {}, cursors = [];
+    d.cursors.forEach(function (c) {
+      if (!c || !ROLES.hasOwnProperty(c.role) || seen[c.role]) return;
+      if (typeof c.png !== 'string' || c.png.length > 3000000 || !/^[A-Za-z0-9+\/]+=*$/.test(c.png)) return;
+      seen[c.role] = true;
+      cursors.push({ role: c.role, src: 'data:image/png;base64,' + c.png, hx: clamp(c.hotX), hy: clamp(c.hotY) });
+    });
+    if (!cursors.length) throw new Error('В паке нет курсоров.');
+    cursors.sort(function (a, b) { return ORDER.indexOf(a.role) - ORDER.indexOf(b.role); });
+    return { name: str(d.name) || 'Без названия', author: str(d.author), cursors: cursors };
+  }
+  function clamp(v) { v = +v; return isFinite(v) ? Math.max(0, Math.min(31, Math.round(v))) : 0; }
+  function str(v) { return typeof v === 'string' ? v.trim().slice(0, 40) : ''; }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function card(pack, href, fileName) {
+    var box = el('div', 'pack');
+    box.appendChild(el('h3', '', pack.name));
+    box.appendChild(el('p', 'by', (pack.author ? 'Автор: ' + pack.author + ' · ' : '') + 'курсоров: ' + pack.cursors.length));
+    var cells = el('div', 'cells');
+    pack.cursors.forEach(function (c, i) {
+      var cell = el('div', 'cell' + (i % 2 ? ' dark' : ''));
+      var img = el('img');
+      img.src = c.src; img.alt = ROLES[c.role]; img.title = ROLES[c.role];
+      cell.appendChild(img);
+      cells.appendChild(cell);
+    });
+    box.appendChild(cells);
+    var row = el('div', 'row');
+    if (href) {
+      var a = el('a', 'btn', 'Скачать .curpack');
+      a.href = href; a.download = fileName;
+      row.appendChild(a);
+    }
+    box.appendChild(row);
+    box.appendChild(el('p', 'hint', 'Наведи мышку на карточку, чтобы попробовать курсор.'));
+
+    // Курсор пака на карточке: уменьшаем картинку до 32 точек.
+    var main = pack.cursors.filter(function (c) { return c.role === 'Arrow'; })[0] || pack.cursors[0];
+    var im = new Image();
+    im.onload = function () {
+      var cv = document.createElement('canvas');
+      cv.width = cv.height = 32;
+      cv.getContext('2d').drawImage(im, 0, 0, 32, 32);
+      box.style.cursor = 'url(' + cv.toDataURL('image/png') + ') ' + main.hx + ' ' + main.hy + ', auto';
+    };
+    im.src = main.src;
+    return box;
+  }
+
+  // Список паков: на GitHub Pages читаем папку packs прямо из репозитория, иначе — файл packs/index.json.
+  var gh = location.hostname.match(/^([^.]+)\.github\.io$/), repo = location.pathname.split('/')[1];
+  function listPacks() {
+    var fromJson = function () {
+      return fetch('packs/index.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw 0; return r.json(); });
+    };
+    if (!gh || !repo) return fromJson();
+    return fetch('https://api.github.com/repos/' + gh[1] + '/' + repo + '/contents/packs')
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (a) { return a.filter(function (f) { return f.type === 'file'; }).map(function (f) { return f.name; }); })
+      .catch(fromJson);
+  }
+
+  var list = document.getElementById('list'), listMsg = document.getElementById('listMsg');
+  listPacks().then(function (names) {
+    names = (Array.isArray(names) ? names : []).filter(function (n) { return typeof n === 'string' && /^[^\/\\]+\.curpack$/i.test(n); }).slice(0, 60);
+    if (!names.length) { listMsg.textContent = 'Паков пока нет.'; return; }
+    var left = names.length, shown = 0;
+    names.forEach(function (name) {
+      var url = 'packs/' + encodeURIComponent(name);
+      fetch(url).then(function (r) { if (!r.ok) throw 0; return r.text(); }).then(function (t) {
+        list.appendChild(card(parsePack(t), url, name));
+        shown++;
+      }).catch(function () {}).then(function () {
+        if (--left === 0) listMsg.textContent = shown ? '' : 'Не получилось загрузить паки. Обнови страницу чуть позже.';
+      });
+    });
+  }).catch(function () { listMsg.textContent = 'Не получилось загрузить список паков. Обнови страницу чуть позже.'; });
+
+  if (gh && repo) {
+    var up = document.getElementById('upload');
+    up.href = 'https://github.com/' + gh[1] + '/' + repo + '/upload/main/packs';
+    up.hidden = false;
+  }
+
+  // Проверка своего файла: читается только в браузере.
+  var mine = document.getElementById('mine'), mineMsg = document.getElementById('mineMsg'), drop = document.getElementById('drop');
+  function showFile(file) {
+    if (!file) return;
+    mineMsg.textContent = '';
+    if (file.size > 20 * 1024 * 1024) { mineMsg.textContent = 'Файл слишком большой для пака.'; return; }
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var c = card(parsePack(rd.result), null, null);
+        mine.textContent = '';
+        mine.appendChild(c);
+      } catch (e) { mineMsg.textContent = e.message; }
+    };
+    rd.onerror = function () { mineMsg.textContent = 'Не получилось прочитать файл.'; };
+    rd.readAsText(file);
+  }
+  document.getElementById('file').addEventListener('change', function () { showFile(this.files[0]); this.value = ''; });
+  ['dragenter', 'dragover'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { showFile(e.dataTransfer.files[0]); });
+</script>
+</body>
+</html>
