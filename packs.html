@@ -64,6 +64,27 @@
   .btn:hover { background: var(--accent-hi); }
   .btn.ghost { background: var(--card2); }
   .btn.ghost:hover { background: var(--line); }
+  dialog {
+    width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto;
+    background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 20px; padding: 22px;
+    color-scheme: dark; scrollbar-color: var(--line) transparent;
+  }
+  dialog::backdrop { background: rgba(8, 8, 14, .72); }
+  dialog h3 { margin: 0 44px 4px 0; font-size: 22px; overflow-wrap: anywhere; }
+  dialog .sub { margin-bottom: 14px; font-size: 15.5px; }
+  dialog .x { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 20px; line-height: 1; }
+  .opts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .opts .btn { padding: 6px 14px; font-size: 14px; }
+  .opts .btn.on { background: var(--accent); }
+  .zones { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+  .zone {
+    height: 118px; border-radius: 14px; background: #e2e5f0; color: #2a2c3c; border: 2px solid transparent;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 10px 6px; text-align: center;
+    font-size: 14px; font-weight: 600; user-select: none;
+  }
+  .zones.dark .zone { background: #0d0e16; color: #cfd3e6; }
+  .zone:hover { border-color: var(--accent); }
+  .zone img { width: 34px; height: 34px; margin-bottom: auto; opacity: .55; pointer-events: none; }
   .msg { color: var(--dim); }
   .msg.bad { color: var(--bad); }
 
@@ -113,15 +134,27 @@
     <p class="msg" id="listMsg">Загружаю паки…</p>
   </section>
 
+  <section id="community" hidden>
+    <h2>Паки от пользователей</h2>
+    <p class="sub">Их загрузили посетители сайта. Свой пак можно добавить ниже, в разделе «Проверить и опубликовать».</p>
+    <div class="packs" id="userList"></div>
+    <p class="msg" id="userMsg">Загружаю паки…</p>
+    <p><button class="btn ghost" id="more" type="button" hidden>Показать ещё</button></p>
+  </section>
+
   <section id="check">
-    <h2>Проверить свой пак</h2>
-    <p class="sub">Посмотри, как пак выглядит, прежде чем делиться им. Файл никуда не отправляется — он открывается только у тебя в браузере.</p>
+    <h2 id="checkTitle">Проверить свой пак</h2>
+    <p class="sub" id="checkSub">Посмотри, как пак выглядит, прежде чем делиться им. Файл никуда не отправляется — он открывается только у тебя в браузере.</p>
     <div class="drop" id="drop">
       <p>Перетащи сюда файл <code>.curpack</code> или выбери его.</p>
       <label class="btn ghost">Выбрать файл<input type="file" id="file" accept=".curpack,application/json"></label>
     </div>
     <div class="packs" id="mine"></div>
     <p class="msg bad" id="mineMsg"></p>
+    <p id="pubRow" hidden>
+      <button class="btn" id="publish" type="button">ОПУБЛИКОВАТЬ НА САЙТЕ</button>
+      <span class="msg" id="pubMsg" style="margin-left:10px"></span>
+    </p>
   </section>
 
   <section id="how">
@@ -143,9 +176,8 @@
           <li>Сделай курсор на вкладке «Формы», «Рисовать», «Картинка» или «ИИ».</li>
           <li>На вкладке <b>«Паки»</b> выбери ячейку и нажми <b>«Вставить мой курсор»</b>. Повтори для остальных ячеек.</li>
           <li>Впиши название и автора, нажми <b>«Сохранить .curpack…»</b>.</li>
-          <li>Этот файл и есть публикация: отправь его друзьям или положи в папку <code>packs</code> этого сайта — и пак сам появится на этой странице.</li>
+          <li id="pubStep">Этот файл и есть публикация: проверь его в разделе «Проверить свой пак» и отправь друзьям.</li>
         </ol>
-        <p style="margin:14px 0 0"><a class="btn ghost" id="upload" hidden target="_blank" rel="noopener">Открыть папку паков на GitHub</a></p>
       </div>
     </div>
     <div class="shot"><img src="img/shot-packs.png" alt="Вкладка «Паки» в программе «Смена курсора»" width="946" height="669" loading="lazy"></div>
@@ -153,6 +185,18 @@
 
   <footer>Смена курсора · курсор-паки для Windows 10 и 11</footer>
 </div>
+
+<dialog id="tester" aria-labelledby="testerName">
+  <button class="btn ghost x" id="testerClose" aria-label="Закрыть">×</button>
+  <h3 id="testerName"></h3>
+  <p class="sub">Наводи мышку на поля — в каждом поле курсор становится таким, как в паке.</p>
+  <div class="opts">
+    <button class="btn ghost" data-size="32">Обычный размер</button>
+    <button class="btn ghost" data-size="64">Крупный</button>
+    <button class="btn ghost" id="testerBg">Тёмный фон</button>
+  </div>
+  <div class="zones" id="zones"></div>
+</dialog>
 
 <script>
   var ROLES = {
@@ -172,7 +216,7 @@
       if (!c || !ROLES.hasOwnProperty(c.role) || seen[c.role]) return;
       if (typeof c.png !== 'string' || c.png.length > 3000000 || !/^[A-Za-z0-9+\/]+=*$/.test(c.png)) return;
       seen[c.role] = true;
-      cursors.push({ role: c.role, src: 'data:image/png;base64,' + c.png, hx: clamp(c.hotX), hy: clamp(c.hotY) });
+      cursors.push({ role: c.role, png: c.png, src: 'data:image/png;base64,' + c.png, hx: clamp(c.hotX), hy: clamp(c.hotY) });
     });
     if (!cursors.length) throw new Error('В паке нет курсоров.');
     cursors.sort(function (a, b) { return ORDER.indexOf(a.role) - ORDER.indexOf(b.role); });
@@ -201,26 +245,67 @@
     });
     box.appendChild(cells);
     var row = el('div', 'row');
+    var test = el('button', 'btn', 'ПРОВЕРИТЬ');
+    test.type = 'button';
+    test.addEventListener('click', function () { openTester(pack); });
+    row.appendChild(test);
     if (href) {
-      var a = el('a', 'btn', 'Скачать .curpack');
+      var a = el('a', 'btn ghost', 'Скачать .curpack');
       a.href = href; a.download = fileName;
       row.appendChild(a);
     }
     box.appendChild(row);
-    box.appendChild(el('p', 'hint', 'Наведи мышку на карточку, чтобы попробовать курсор.'));
+    box.appendChild(el('p', 'hint', 'Кнопка «ПРОВЕРИТЬ» открывает окно, где можно попробовать каждый курсор.'));
 
-    // Курсор пака на карточке: уменьшаем картинку до 32 точек.
+    // Курсор пака на карточке.
     var main = pack.cursors.filter(function (c) { return c.role === 'Arrow'; })[0] || pack.cursors[0];
+    setCursor(box, main, 32);
+    return box;
+  }
+
+  // Ставит элементу курсор из пака: картинка уменьшается до size точек, остриё пересчитывается.
+  function setCursor(node, c, size) {
     var im = new Image();
     im.onload = function () {
       var cv = document.createElement('canvas');
-      cv.width = cv.height = 32;
-      cv.getContext('2d').drawImage(im, 0, 0, 32, 32);
-      box.style.cursor = 'url(' + cv.toDataURL('image/png') + ') ' + main.hx + ' ' + main.hy + ', auto';
+      cv.width = cv.height = size;
+      cv.getContext('2d').drawImage(im, 0, 0, size, size);
+      var k = size / 32;
+      node.style.cursor = 'url(' + cv.toDataURL('image/png') + ') ' + Math.min(size - 1, Math.round(c.hx * k)) + ' ' + Math.min(size - 1, Math.round(c.hy * k)) + ', auto';
     };
-    im.src = main.src;
-    return box;
+    im.src = c.src;
   }
+
+  // Окно проверки: поле на каждый курсор пака.
+  var tester = document.getElementById('tester'), zones = document.getElementById('zones');
+  var testerPack = null, testerSize = 32;
+  function fillTester() {
+    zones.textContent = '';
+    testerPack.cursors.forEach(function (c) {
+      var z = el('div', 'zone');
+      var img = el('img');
+      img.src = c.src; img.alt = '';
+      z.appendChild(img);
+      z.appendChild(el('span', '', ROLES[c.role]));
+      setCursor(z, c, testerSize);
+      zones.appendChild(z);
+    });
+    [].forEach.call(tester.querySelectorAll('[data-size]'), function (b) { b.classList.toggle('on', +b.dataset.size === testerSize); });
+  }
+  function openTester(pack) {
+    testerPack = pack;
+    document.getElementById('testerName').textContent = 'Проверка: ' + pack.name;
+    fillTester();
+    if (tester.showModal) tester.showModal(); else tester.setAttribute('open', '');
+  }
+  [].forEach.call(tester.querySelectorAll('[data-size]'), function (b) {
+    b.addEventListener('click', function () { testerSize = +b.dataset.size; fillTester(); });
+  });
+  document.getElementById('testerBg').addEventListener('click', function () {
+    this.textContent = zones.classList.toggle('dark') ? 'Светлый фон' : 'Тёмный фон';
+  });
+  document.getElementById('testerClose').addEventListener('click', function () { tester.close(); });
+  tester.addEventListener('click', function (e) { if (e.target === tester) tester.close(); });
 
   // Список паков: на GitHub Pages читаем папку packs прямо из репозитория, иначе — файл packs/index.json.
   var gh = location.hostname.match(/^([^.]+)\.github\.io$/), repo = location.pathname.split('/')[1];
@@ -251,10 +336,88 @@
     });
   }).catch(function () { listMsg.textContent = 'Не получилось загрузить список паков. Обнови страницу чуть позже.'; });
 
-  if (gh && repo) {
-    var up = document.getElementById('upload');
-    up.href = 'https://github.com/' + gh[1] + '/' + repo + '/upload/main/packs';
-    up.hidden = false;
+  // ----- Публикация паков посетителями: база Firebase Firestore (бесплатный тариф) -----
+  // Сюда вписывается название проекта Firebase. Пока оно пустое, публикация на сайте выключена.
+  var FIREBASE = { projectId: 'cursor-packs' };
+  var FS = 'https://firestore.googleapis.com/v1/projects/' + FIREBASE.projectId + '/databases/(default)/documents';
+  var MAX_PACK = 900000;
+  var minePack = null, pubRow = document.getElementById('pubRow'), pubMsg = document.getElementById('pubMsg');
+  var userList = document.getElementById('userList'), userMsg = document.getElementById('userMsg'), more = document.getElementById('more');
+
+  // Собирает чистый текст пака только из проверенных данных.
+  function packText(p) {
+    return JSON.stringify({
+      format: 'curpack', version: 1, name: p.name, author: p.author,
+      cursors: p.cursors.map(function (c) { return { role: c.role, hotX: c.hx, hotY: c.hy, png: c.png }; })
+    });
+  }
+  function fileName(p) { return (p.name.replace(/[\\\/:*?"<>|]/g, '_') || 'pack') + '.curpack'; }
+
+  function loadUserPacks(token) {
+    var url = FS + '/packs?pageSize=12&orderBy=' + encodeURIComponent('created desc') + '&mask.fieldPaths=name' + (token ? '&pageToken=' + encodeURIComponent(token) : '');
+    more.hidden = true;
+    fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (d) {
+      var docs = d.documents || [];
+      if (!docs.length && !token) { userMsg.textContent = 'Пока никто не загрузил пак. Будь первым!'; return; }
+      userMsg.textContent = '';
+      docs.forEach(function (doc) {
+        var id = String(doc.name).split('/').pop();
+        if (!/^[A-Za-z0-9]{1,40}$/.test(id)) return;
+        var slot = el('div');
+        slot.style.display = 'contents';
+        userList.appendChild(slot);
+        fetch(FS + '/packs/' + id).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (full) {
+          var p = parsePack(full.fields.data.stringValue);
+          slot.appendChild(card(p, URL.createObjectURL(new Blob([packText(p)], { type: 'application/json' })), fileName(p)));
+        }).catch(function () { slot.remove(); });
+      });
+      if (d.nextPageToken) { more.hidden = false; more.onclick = function () { loadUserPacks(d.nextPageToken); }; }
+    }).catch(function () { userMsg.textContent = 'Не получилось загрузить паки пользователей. Обнови страницу чуть позже.'; });
+  }
+
+  function publish() {
+    if (!minePack) return;
+    var text = packText(minePack), btn = document.getElementById('publish');
+    var say = function (t, bad) { pubMsg.textContent = t; pubMsg.className = bad ? 'msg bad' : 'msg'; };
+    if (text.length > MAX_PACK) { say('Пак слишком большой для сайта. Попробуй курсоры попроще.', true); return; }
+    var last = 0;
+    try { last = +localStorage.getItem('curpackPublished') || 0; } catch (e) {}
+    if (Date.now() - last < 60000) { say('Подожди минуту перед следующей публикацией.', true); return; }
+    var id = '', abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', rnd = new Uint8Array(20);
+    crypto.getRandomValues(rnd);
+    for (var i = 0; i < 20; i++) id += abc[rnd[i] % abc.length];
+    var body = { writes: [{
+      update: {
+        name: 'projects/' + FIREBASE.projectId + '/databases/(default)/documents/packs/' + id,
+        fields: {
+          name: { stringValue: minePack.name }, author: { stringValue: minePack.author },
+          count: { integerValue: String(minePack.cursors.length) }, data: { stringValue: text }
+        }
+      },
+      currentDocument: { exists: false },
+      updateTransforms: [{ fieldPath: 'created', setToServerValue: 'REQUEST_TIME' }]
+    }] };
+    btn.disabled = true; say('Публикую…');
+    fetch(FS + ':commit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { if (!r.ok) throw 0; })
+      .then(function () {
+        try { localStorage.setItem('curpackPublished', String(Date.now())); } catch (e) {}
+        say('Готово! Пак опубликован и виден всем.');
+        userMsg.textContent = '';
+        userList.insertBefore(card(minePack, URL.createObjectURL(new Blob([text], { type: 'application/json' })), fileName(minePack)), userList.firstChild);
+        pubRow.hidden = true; minePack = null;
+      })
+      .catch(function () { say('Не получилось опубликовать. Попробуй ещё раз чуть позже.', true); })
+      .then(function () { btn.disabled = false; });
+  }
+
+  if (FIREBASE.projectId) {
+    document.getElementById('community').hidden = false;
+    document.getElementById('checkTitle').textContent = 'Проверить и опубликовать свой пак';
+    document.getElementById('checkSub').textContent = 'Выбери файл — он откроется у тебя в браузере. Понравилось — нажми «ОПУБЛИКОВАТЬ НА САЙТЕ», и пак увидят все. Публикуй только свои рисунки.';
+    document.getElementById('pubStep').textContent = 'Этот файл и есть публикация: загрузи его в разделе «Проверить и опубликовать свой пак» — и он появится на этой странице.';
+    document.getElementById('publish').addEventListener('click', publish);
+    loadUserPacks(null);
   }
 
   // Проверка своего файла: читается только в браузере.
@@ -266,9 +429,12 @@
     var rd = new FileReader();
     rd.onload = function () {
       try {
-        var c = card(parsePack(rd.result), null, null);
+        var p = parsePack(rd.result);
         mine.textContent = '';
-        mine.appendChild(c);
+        mine.appendChild(card(p, null, null));
+        minePack = p;
+        pubMsg.textContent = ''; pubMsg.className = 'msg';
+        pubRow.hidden = !FIREBASE.projectId;
       } catch (e) { mineMsg.textContent = e.message; }
     };
     rd.onerror = function () { mineMsg.textContent = 'Не получилось прочитать файл.'; };
